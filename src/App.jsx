@@ -209,6 +209,7 @@ export default function App() {
             <p>VITE_SUPABASE_URL</p>
             <p>VITE_SUPABASE_ANON_KEY</p>
             {supabaseConfigError ? <p className="mt-2">Error: {supabaseConfigError}</p> : null}
+            <p className="mt-3">Vercel path: Project Settings to Environment Variables, add both keys, then Redeploy.</p>
           </div>
         </div>
       </div>
