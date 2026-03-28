@@ -1,6 +1,17 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
+function isMissingSessionQuestionsTableError(error) {
+  if (!error) return false;
+  const code = error.code || '';
+  const message = (error.message || '').toLowerCase();
+  return (
+    code === '42P01' ||
+    code === 'PGRST205' ||
+    message.includes('session_questions') && (message.includes('not exist') || message.includes('schema cache'))
+  );
+}
+
 export function useGameSync(pin) {
   const [sessionData, setSessionData] = useState(null);
   const [players, setPlayers] = useState([]);
@@ -56,7 +67,7 @@ export function useGameSync(pin) {
           .eq('session_id', sessionId)
           .order('created_at', { ascending: true });
 
-        if (customQuestionsError?.code === '42P01') {
+        if (isMissingSessionQuestionsTableError(customQuestionsError)) {
           hasSessionQuestionsTableRef.current = false;
           questionsData = [];
         } else if (customQuestionsError) {

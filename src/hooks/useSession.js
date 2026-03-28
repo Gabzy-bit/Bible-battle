@@ -8,7 +8,14 @@ function generatePin() {
 }
 
 function isMissingTableError(error) {
-  return error?.code === '42P01';
+  if (!error) return false;
+  const code = error.code || '';
+  const message = (error.message || '').toLowerCase();
+  return (
+    code === '42P01' ||
+    code === 'PGRST205' ||
+    message.includes('session_questions') && (message.includes('not exist') || message.includes('schema cache'))
+  );
 }
 
 export function useSession() {

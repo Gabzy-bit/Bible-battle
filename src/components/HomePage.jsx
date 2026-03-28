@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePlayer } from '../hooks/usePlayer';
 import { useSession } from '../hooks/useSession';
@@ -13,6 +13,16 @@ export default function HomePage() {
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const url = new URL(window.location.href);
+    const queryPin = (url.searchParams.get('pin') || '').replace(/\D/g, '').slice(0, 6);
+    if (queryPin) {
+      setPin(queryPin);
+      setIsJoining(true);
+    }
+  }, []);
 
   const continueHostPin = useMemo(() => getStoredHostPin(), [getStoredHostPin]);
 

@@ -77,7 +77,7 @@ export default function HostDashboard() {
 
   const joinUrl = useMemo(() => {
     if (typeof window === 'undefined') return '';
-    return `${window.location.origin}/play/${pin}`;
+    return `${window.location.origin}/?pin=${pin}`;
   }, [pin]);
 
   const answersForCurrentQuestion = useMemo(() => {
