@@ -15,7 +15,7 @@ import { isSupabaseConfigured, supabaseConfigError } from './lib/supabase';
 function PlayerGameRoute() {
   const { pin } = useParams();
   const navigate = useNavigate();
-  const { sessionData, players, answers, loading } = useGameSync(pin);
+  const { sessionData, players, answers, sessionQuestions, loading } = useGameSync(pin);
 
   const [playerContext, setPlayerContext] = useState({
     playerId: null,
@@ -77,10 +77,21 @@ function PlayerGameRoute() {
     return undefined;
   }, [sessionData?.status]);
 
+  const allQuestions = useMemo(() => {
+    const custom = (sessionQuestions || []).map((question) => ({
+      question: question.question,
+      options: Array.isArray(question.options) ? question.options : [],
+      correct: question.correct,
+      scripture: question.scripture || 'Custom Question',
+    }));
+
+    return [...BIBLE_QUESTIONS, ...custom];
+  }, [sessionQuestions]);
+
   const currentQuestion = useMemo(() => {
     const index = sessionData?.current_question_index ?? 0;
-    return BIBLE_QUESTIONS[index];
-  }, [sessionData?.current_question_index]);
+    return allQuestions[index];
+  }, [allQuestions, sessionData?.current_question_index]);
 
   const playerAnswer = useMemo(() => {
     if (!playerContext.playerId || !sessionData) return null;
@@ -151,7 +162,7 @@ function PlayerGameRoute() {
       <QuestionScreen
         question={currentQuestion}
         questionIndex={sessionData.current_question_index}
-        totalQuestions={BIBLE_QUESTIONS.length}
+        totalQuestions={allQuestions.length}
         selectedOption={playerAnswer?.selected_option || null}
         locked={Boolean(playerAnswer)}
         startTime={sessionData.question_start_time}

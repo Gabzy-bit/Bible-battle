@@ -68,17 +68,30 @@ create table answers (
 	created_at timestamptz default now()
 );
 
+create table session_questions (
+	id uuid default gen_random_uuid() primary key,
+	session_id uuid references sessions(id) on delete cascade,
+	question text not null,
+	options jsonb not null,
+	correct text not null,
+	scripture text,
+	created_at timestamptz default now()
+);
+
 alter table sessions enable row level security;
 alter table players enable row level security;
 alter table answers enable row level security;
+alter table session_questions enable row level security;
 
 create policy "public_all_sessions" on sessions for all using (true) with check (true);
 create policy "public_all_players" on players for all using (true) with check (true);
 create policy "public_all_answers" on answers for all using (true) with check (true);
+create policy "public_all_session_questions" on session_questions for all using (true) with check (true);
 
 alter publication supabase_realtime add table sessions;
 alter publication supabase_realtime add table players;
 alter publication supabase_realtime add table answers;
+alter publication supabase_realtime add table session_questions;
 ```
 
 6. Start development server.
