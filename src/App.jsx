@@ -10,6 +10,7 @@ import QuestionScreen from './components/QuestionScreen';
 import { useGameSync } from './hooks/useGameSync';
 import { usePlayer } from './hooks/usePlayer';
 import { BIBLE_QUESTIONS } from './lib/questions';
+import { isSupabaseConfigured, supabaseConfigError } from './lib/supabase';
 
 function PlayerGameRoute() {
   const { pin } = useParams();
@@ -195,6 +196,25 @@ function PlayerGameRoute() {
 }
 
 export default function App() {
+  if (!isSupabaseConfigured || supabaseConfigError) {
+    return (
+      <div className="app-shell flex min-h-screen items-center justify-center bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-800 px-4 text-white">
+        <div className="card w-full max-w-2xl border border-red-200/40 bg-red-500/20 text-center">
+          <h1 className="text-3xl font-black">Configuration Required</h1>
+          <p className="mt-3 text-lg text-red-100">
+            Bible Battle could not initialize Supabase. Add your Vercel environment variables and redeploy.
+          </p>
+          <div className="mt-6 rounded-xl bg-black/30 p-4 text-left text-sm text-red-100">
+            <p>Required variables:</p>
+            <p>VITE_SUPABASE_URL</p>
+            <p>VITE_SUPABASE_ANON_KEY</p>
+            {supabaseConfigError ? <p className="mt-2">Error: {supabaseConfigError}</p> : null}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <BrowserRouter>
       <Routes>
